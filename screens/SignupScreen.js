@@ -1,5 +1,5 @@
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Animated, Platform, Button } from 'react-native';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export default function SignupScreen({ navigation }) {
@@ -10,6 +10,40 @@ export default function SignupScreen({ navigation }) {
   const [teamChoiceFocused, setTeamChoiceFocused] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [date, setDate] = useState(new Date());
+
+  // Create animated values for each input
+  const nameBorderAnim = useRef(new Animated.Value(0)).current;
+  const emailBorderAnim = useRef(new Animated.Value(0)).current;
+  const passwordBorderAnim = useRef(new Animated.Value(0)).current;
+  const birthDateBorderAnim = useRef(new Animated.Value(0)).current;
+  const teamChoiceBorderAnim = useRef(new Animated.Value(0)).current;
+
+  // Fade animations
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const titleFadeAnim = useRef(new Animated.Value(0)).current;
+  const buttonScaleAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Start animations when component mounts
+    Animated.sequence([
+      Animated.timing(titleFadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(buttonScaleAnim, {
+        toValue: 1,
+        friction: 3,
+        tension: 40,
+        useNativeDriver: true,
+      })
+    ]).start();
+  }, []);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -25,12 +59,6 @@ export default function SignupScreen({ navigation }) {
     hideDatePicker();
   };
 
-  // Create animated values for each input
-  const nameBorderAnim = useRef(new Animated.Value(0)).current;
-  const emailBorderAnim = useRef(new Animated.Value(0)).current;
-  const passwordBorderAnim = useRef(new Animated.Value(0)).current;
-  const birthDateBorderAnim = useRef(new Animated.Value(0)).current;
-  const teamChoiceBorderAnim = useRef(new Animated.Value(0)).current;
   // Animation function
   const animateBorder = (animValue, toValue) => {
     Animated.timing(animValue, {
@@ -42,9 +70,11 @@ export default function SignupScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titleH2}>Crie sua conta</Text>
+      <Animated.View style={{ opacity: titleFadeAnim }}>
+        <Text style={styles.titleH2}>Crie sua conta</Text>
+      </Animated.View>
 
-      <View style={styles.inputContainer}>
+      <Animated.View style={[styles.inputContainer, { opacity: fadeAnim }]}>
         <TextInput 
           placeholder="Nome" 
           placeholderTextColor="white"
@@ -71,9 +101,9 @@ export default function SignupScreen({ navigation }) {
             })
           }
         ]} />
-      </View>
+      </Animated.View>
 
-      <View style={styles.inputContainer}>
+      <Animated.View style={[styles.inputContainer, { opacity: fadeAnim }]}>
         <TextInput 
           placeholder="Email" 
           placeholderTextColor="white"
@@ -100,9 +130,9 @@ export default function SignupScreen({ navigation }) {
             })
           }
         ]} />
-      </View>
+      </Animated.View>
 
-      <View style={styles.inputContainer}>
+      <Animated.View style={[styles.inputContainer, { opacity: fadeAnim }]}>
         <TextInput 
           placeholder="Senha" 
           placeholderTextColor="white"
@@ -130,10 +160,9 @@ export default function SignupScreen({ navigation }) {
             })
           }
         ]} />
-      </View>
+      </Animated.View>
 
-
-      <View style={styles.inputContainer}>
+      <Animated.View style={[styles.inputContainer, { opacity: fadeAnim }]}>
         <TextInput 
           placeholder="Para qual time você torce?"
           placeholderTextColor="white"
@@ -160,12 +189,13 @@ export default function SignupScreen({ navigation }) {
             })
           }
         ]} />
-      </View>
-      <View style={styles.inputContainer}>
+      </Animated.View>
+
+      <Animated.View style={[styles.inputContainer, { opacity: fadeAnim }]}>
         <Text style={styles.input}>Insira sua data de nascimento
-        <TouchableOpacity onPress={showDatePicker}>
-          <Text style={styles.dateText}>{date.toLocaleDateString('pt-BR')}</Text>  
-        </TouchableOpacity>
+          <TouchableOpacity onPress={showDatePicker}>
+            <Text style={styles.dateText}>{date.toLocaleDateString('pt-BR')}</Text>  
+          </TouchableOpacity>
         </Text>
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
@@ -176,18 +206,31 @@ export default function SignupScreen({ navigation }) {
           maximumDate={new Date()}
           minimumDate={new Date(1900, 0, 1)}
         />
-        
-      </View>
+      </Animated.View>
 
-      <TouchableOpacity style={styles.buttonCadastro} onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.buttonText}>Cadastrar</Text>
-      </TouchableOpacity>
-      <View style={styles.loginContainer}>
+      <Animated.View style={[
+        styles.buttonContainer,
+        {
+          opacity: fadeAnim,
+          transform: [{
+            scale: buttonScaleAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0.8, 1]
+            })
+          }]
+        }
+      ]}>
+        <TouchableOpacity style={styles.buttonCadastro} onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.buttonText}>Cadastrar</Text>
+        </TouchableOpacity>
+      </Animated.View>
+
+      <Animated.View style={[styles.loginContainer, { opacity: fadeAnim }]}>
         <Text style={styles.loginText}>Já tem uma conta? </Text>
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={styles.loginLink}>Fazer login</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -223,12 +266,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
   },
+  buttonContainer: {
+    width: '80%',
+    alignSelf: 'center',
+  },
   buttonCadastro: { 
     backgroundColor: '#ff0000',
     padding: 15,
     borderRadius: 10,
-    width: '80%',
-    alignSelf: 'center',
     marginBottom: 10
   },
   buttonText: {

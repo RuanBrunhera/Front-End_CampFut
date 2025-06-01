@@ -1,5 +1,5 @@
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Animated } from 'react-native';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export default function LoginScreen({ navigation }) {
   const [emailFocused, setEmailFocused] = useState(false);
@@ -8,6 +8,33 @@ export default function LoginScreen({ navigation }) {
   // Create animated values for each input
   const emailBorderAnim = useRef(new Animated.Value(0)).current;
   const passwordBorderAnim = useRef(new Animated.Value(0)).current;
+
+  // Fade animations
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const titleFadeAnim = useRef(new Animated.Value(0)).current;
+  const buttonScaleAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Start animations when component mounts
+    Animated.sequence([
+      Animated.timing(titleFadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(buttonScaleAnim, {
+        toValue: 1,
+        friction: 3,
+        tension: 40,
+        useNativeDriver: true,
+      })
+    ]).start();
+  }, []);
 
   // Animation function
   const animateBorder = (animValue, toValue) => {
@@ -25,10 +52,12 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titleH2}>Bem-Vindo(a) ao</Text>
-      <Text style={styles.titleH1}>*nome do app*</Text>
+      <Animated.View style={{ opacity: titleFadeAnim }}>
+        <Text style={styles.titleH2}>Bem-Vindo(a) ao</Text>
+        <Text style={styles.titleH1}>*nome do app*</Text>
+      </Animated.View>
       
-      <View style={styles.inputContainer}>
+      <Animated.View style={[styles.inputContainer, { opacity: fadeAnim }]}>
         <TextInput 
           placeholder="Insira seu email" 
           placeholderTextColor="white"
@@ -55,9 +84,9 @@ export default function LoginScreen({ navigation }) {
             })
           }
         ]} />
-      </View>
+      </Animated.View>
 
-      <View style={styles.inputContainer}>
+      <Animated.View style={[styles.inputContainer, { opacity: fadeAnim }]}>
         <TextInput 
           placeholder="Insira sua senha" 
           placeholderTextColor="white"
@@ -85,17 +114,31 @@ export default function LoginScreen({ navigation }) {
             })
           }
         ]} />
-      </View>
+      </Animated.View>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
-      </TouchableOpacity>
-      <View style={styles.cadastroContainer}>
+      <Animated.View style={[
+        styles.buttonContainer,
+        {
+          opacity: fadeAnim,
+          transform: [{
+            scale: buttonScaleAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0.8, 1]
+            })
+          }]
+        }
+      ]}>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Entrar</Text>
+        </TouchableOpacity>
+      </Animated.View>
+
+      <Animated.View style={[styles.cadastroContainer, { opacity: fadeAnim }]}>
         <Text style={styles.cadastroText}>Ainda não tem conta? </Text>
         <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
           <Text style={styles.cadastroLink}>Criar conta</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -138,21 +181,17 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
   },
+  buttonContainer: {
+    width: '80%',
+    alignSelf: 'center',
+  },
   button: { 
     backgroundColor: '#ff0000',
     padding: 15,
     borderRadius: 10,
-    width: '80%',
-    alignSelf: 'center',
     marginBottom: 10
   },
   buttonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: 'bold'
-  },
-  text: {
     color: 'white',
     textAlign: 'center',
     fontSize: 16,

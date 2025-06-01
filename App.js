@@ -3,11 +3,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TabNavigator from './navigation/TabNavigator';
 import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
+import { MatchProvider } from './context/MatchContext';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
+    <MatchProvider>
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
@@ -37,5 +39,6 @@ export default function App() {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    </MatchProvider>
   );
 }

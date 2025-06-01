@@ -1,7 +1,9 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ProfileScreen() {
+  const navigation = useNavigation();
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
@@ -59,19 +61,13 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Configurações</Text>
           <View style={styles.settingsCard}>
-            <TouchableOpacity style={styles.settingItem}>
+            <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('Notifications')}>
               <Ionicons name="notifications-outline" size={24} color="#ff0000" />
               <Text style={styles.settingText}>Notificações</Text>
               <Ionicons name="chevron-forward" size={24} color="#666" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.settingItem}>
-              <Ionicons name="lock-closed-outline" size={24} color="#ff0000" />
-              <Text style={styles.settingText}>Privacidade</Text>
-              <Ionicons name="chevron-forward" size={24} color="#666" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.settingItem}>
+            <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('Help')}>
               <Ionicons name="help-circle-outline" size={24} color="#ff0000" />
               <Text style={styles.settingText}>Ajuda</Text>
               <Ionicons name="chevron-forward" size={24} color="#666" />
@@ -79,7 +75,7 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Login')}>
           <Ionicons name="log-out-outline" size={24} color="white" />
           <Text style={styles.logoutText}>Sair</Text>
         </TouchableOpacity>
@@ -96,6 +92,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1a1a1a',
+    paddingTop: 10,
   },
   header: {
     alignItems: 'center',
